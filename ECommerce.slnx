@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Backend/ECommerce.API/ECommerce.API.csproj" />
+  <Project Path="Backend/ECommerce.Application/ECommerce.Application.csproj" />
+  <Project Path="Backend/ECommerce.Domain/ECommerce.Domain.csproj" />
+  <Project Path="Backend/ECommerce.Infrastructure/ECommerce.Infrastructure.csproj" />
+</Solution>

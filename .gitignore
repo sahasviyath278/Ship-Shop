@@ -1,0 +1,47 @@
+# Build results
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Backend
+appsettings.Development.json
+appsettings.*.json
+!appsettings.json
+*.user
+*.suo
+.vs/
+
+# Frontend
+node_modules/
+.next/
+out/
+.env.local
+.env.*.local
+dist/
+coverage/
+
+# Logs
+logs/
+*.log
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Dependencies
+packages/
+.nuget/
+
+# User Secrets
+secrets.json
