@@ -1,0 +1,72 @@
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  DOTNET_VERSION: "10.0"
+  NODE_VERSION: "20"
+
+# -------------------- TEST --------------------
+backend-test:
+  stage: test
+  image: mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION}
+  script:
+    - cd Backend
+    - dotnet restore
+    - dotnet test --no-restore
+
+frontend-test:
+  stage: test
+  image: node:${NODE_VERSION}-alpine
+  script:
+    - cd frontend
+    - npm ci
+    - npm run test -- --ci --watchAll=false   # add a simple test later or just check build
+  allow_failure: true   # temporary until you add a real frontend test
+
+# -------------------- BUILD --------------------
+backend-build:
+  stage: build
+  image: mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION}
+  script:
+    - cd Backend
+    - dotnet publish ECommerce.API -c Release -o publish
+  artifacts:
+    paths:
+      - Backend/publish/
+
+frontend-build:
+  stage: build
+  image: node:${NODE_VERSION}-alpine
+  script:
+    - cd frontend
+    - npm ci
+    - npm run build
+  artifacts:
+    paths:
+      - frontend/.next/
+
+# -------------------- DEPLOY (staging) --------------------
+deploy-backend-staging:
+  stage: deploy
+  image: alpine:latest
+  needs: [backend-build]
+  script:
+    - echo "Backend staging deploy: upload Backend/publish to your staging server"
+    # Replace the echo with real commands, e.g., scp, heroku deploy, etc.
+  environment:
+    name: staging
+    url: https://staging-api.shipshop.example.com
+
+deploy-frontend-staging:
+  stage: deploy
+  image: node:${NODE_VERSION}-alpine
+  needs: [frontend-build]
+  script:
+    - echo "Frontend staging deploy: deploy .next folder to Vercel/Netlify"
+    # Example for Vercel (requires $VERCEL_TOKEN variable):
+    # npx vercel --prod --token $VERCEL_TOKEN
+  environment:
+    name: staging
+    url: https://staging-shipshop.vercel.app
