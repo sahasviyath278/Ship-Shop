@@ -3,32 +3,17 @@ stages:
   - build
   - deploy
 
-variables:
-  DOTNET_VERSION: "10.0"          # use "10.0" if you are on .NET 10
-  NODE_VERSION: "20"
-
-# -------------------- TEST --------------------
 backend-test:
   stage: test
-  image: mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION}
+  image: mcr.microsoft.com/dotnet/sdk:10.0
   script:
     - cd Backend
     - dotnet restore
     - dotnet test --no-restore
 
-frontend-test:
-  stage: test
-  image: node:${NODE_VERSION}-alpine
-  script:
-    - cd frontend
-    - npm ci
-    - npm run test -- --ci --watchAll=false
-  allow_failure: true
-
-# -------------------- BUILD --------------------
 backend-build:
   stage: build
-  image: mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION}
+  image: mcr.microsoft.com/dotnet/sdk:10.0
   script:
     - cd Backend
     - dotnet publish ECommerce.API -c Release -o publish
@@ -36,36 +21,13 @@ backend-build:
     paths:
       - Backend/publish/
 
-frontend-build:
-  stage: build
-  image: node:${NODE_VERSION}-alpine
-  script:
-    - cd frontend
-    - npm ci
-    - npm run build
-  artifacts:
-    paths:
-      - frontend/.next/
-
-# -------------------- DEPLOY (staging) --------------------
 deploy-backend-staging:
   stage: deploy
   image: alpine:latest
   needs:
     - backend-build
   script:
-    - echo "Backend staging deploy: upload Backend/publish to your staging server"
+    - echo "Deploy backend"
   environment:
     name: staging
     url: https://staging-api.shipshop.example.com
-
-deploy-frontend-staging:
-  stage: deploy
-  image: node:${NODE_VERSION}-alpine
-  needs:
-    - frontend-build
-  script:
-    - echo "Frontend staging deploy: deploy .next folder to Vercel/Netlify"
-  environment:
-    name: staging
-    url: https://staging-shipshop.vercel.app
